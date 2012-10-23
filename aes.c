@@ -173,6 +173,33 @@ void shiftRows(byte *state)
 	state[12] = t;
 }
 
+void shiftColumns(byte *state)
+{
+	byte t;	//byte temp for rotation
+
+	//rotate "column 2"
+	t = state[1];
+	state[1] = state[5];
+	state[5] = state[9];
+	state[9] = state[13];
+	state[13] = t;
+
+	//rotate "column 3"
+	t = state[2];
+	state[2] = state[10];
+	state[10] = t;
+	t = state[6];
+	state[6] = state[14];
+	state[14] = t;
+
+	//rotate "column 4"
+	t = state[15];
+	state[15] = state[11];
+	state[11] = state[7];
+	state[7] = state[3];
+	state[3] = t;
+}
+
 byte mixColumnsMult(byte mixcolumnnum, byte statebyte)
 {
 	byte mult2[256] = {0x00,0x02,0x04,0x06,0x08,0x0a,0x0c,0x0e,0x10,0x12,0x14,0x16,0x18,0x1a,0x1c,0x1e,
@@ -221,58 +248,64 @@ byte mixColumnsMult(byte mixcolumnnum, byte statebyte)
 void mixColumns(byte *state){
 	byte matrix[16] = {2, 3, 1, 1, 1, 2, 3, 1 ,1, 1, 2, 3, 3, 1, 1, 2};	
 	byte column[4];
+	byte tempstate[16];
 
-	column[0] = state[0];
-	column[1] = state[4];
-	column[2] = state[8];
-	column[3] = state[12];
+	int i;
+	for(i = 0;i < 16;i++){
+		tempstate[i] = state[i];
+	}
+
+	column[0] = tempstate[0];
+	column[1] = tempstate[4];
+	column[2] = tempstate[8];
+	column[3] = tempstate[12];
 	
 	state[0] = mixColumnsMult(matrix[0], column[0]) ^ mixColumnsMult(matrix[1], column[1]) ^ mixColumnsMult(matrix[2], column[2]) ^ mixColumnsMult(matrix[3], column[3]);
 
-	state[4] = mixColumnsMult(matrix[4], column[0]) ^ mixColumnsMult(matrix[5], column[1]) ^ mixColumnsMult(matrix[6], column[2]) ^ mixColumnsMult(matrix[7], column[3]);
+	state[1] = mixColumnsMult(matrix[4], column[0]) ^ mixColumnsMult(matrix[5], column[1]) ^ mixColumnsMult(matrix[6], column[2]) ^ mixColumnsMult(matrix[7], column[3]);
 
-	state[8] = mixColumnsMult(matrix[8], column[0]) ^ mixColumnsMult(matrix[9], column[1]) ^ mixColumnsMult(matrix[10], column[2]) ^ mixColumnsMult(matrix[11], column[3]);
+	state[2] = mixColumnsMult(matrix[8], column[0]) ^ mixColumnsMult(matrix[9], column[1]) ^ mixColumnsMult(matrix[10], column[2]) ^ mixColumnsMult(matrix[11], column[3]);
+
+	state[3] = mixColumnsMult(matrix[12], column[0]) ^ mixColumnsMult(matrix[13], column[1]) ^ mixColumnsMult(matrix[14], column[2]) ^ mixColumnsMult(matrix[15], column[3]);
+
+	column[0] = tempstate[1];
+	column[1] = tempstate[5];
+	column[2] = tempstate[9];
+	column[3] = tempstate[13];
+	
+	state[13] = mixColumnsMult(matrix[0], column[0]) ^ mixColumnsMult(matrix[1], column[1]) ^ mixColumnsMult(matrix[2], column[2]) ^ mixColumnsMult(matrix[3], column[3]);
+
+	state[14] = mixColumnsMult(matrix[4], column[0]) ^ mixColumnsMult(matrix[5], column[1]) ^ mixColumnsMult(matrix[6], column[2]) ^ mixColumnsMult(matrix[7], column[3]);
+
+	state[15] = mixColumnsMult(matrix[8], column[0]) ^ mixColumnsMult(matrix[9], column[1]) ^ mixColumnsMult(matrix[10], column[2]) ^ mixColumnsMult(matrix[11], column[3]);
 
 	state[12] = mixColumnsMult(matrix[12], column[0]) ^ mixColumnsMult(matrix[13], column[1]) ^ mixColumnsMult(matrix[14], column[2]) ^ mixColumnsMult(matrix[15], column[3]);
 
-	column[0] = state[1];
-	column[1] = state[5];
-	column[2] = state[9];
-	column[3] = state[13];
+	column[0] = tempstate[2];
+	column[1] = tempstate[6];
+	column[2] = tempstate[10];
+	column[3] = tempstate[14];
 	
-	state[1] = mixColumnsMult(matrix[0], column[0]) ^ mixColumnsMult(matrix[1], column[1]) ^ mixColumnsMult(matrix[2], column[2]) ^ mixColumnsMult(matrix[3], column[3]);
+	state[10] = mixColumnsMult(matrix[0], column[0]) ^ mixColumnsMult(matrix[1], column[1]) ^ mixColumnsMult(matrix[2], column[2]) ^ mixColumnsMult(matrix[3], column[3]);
 
-	state[5] = mixColumnsMult(matrix[4], column[0]) ^ mixColumnsMult(matrix[5], column[1]) ^ mixColumnsMult(matrix[6], column[2]) ^ mixColumnsMult(matrix[7], column[3]);
+	state[11] = mixColumnsMult(matrix[4], column[0]) ^ mixColumnsMult(matrix[5], column[1]) ^ mixColumnsMult(matrix[6], column[2]) ^ mixColumnsMult(matrix[7], column[3]);
 
-	state[9] = mixColumnsMult(matrix[8], column[0]) ^ mixColumnsMult(matrix[9], column[1]) ^ mixColumnsMult(matrix[10], column[2]) ^ mixColumnsMult(matrix[11], column[3]);
+	state[8] = mixColumnsMult(matrix[8], column[0]) ^ mixColumnsMult(matrix[9], column[1]) ^ mixColumnsMult(matrix[10], column[2]) ^ mixColumnsMult(matrix[11], column[3]);
 
-	state[13] = mixColumnsMult(matrix[12], column[0]) ^ mixColumnsMult(matrix[13], column[1]) ^ mixColumnsMult(matrix[14], column[2]) ^ mixColumnsMult(matrix[15], column[3]);
+	state[9] = mixColumnsMult(matrix[12], column[0]) ^ mixColumnsMult(matrix[13], column[1]) ^ mixColumnsMult(matrix[14], column[2]) ^ mixColumnsMult(matrix[15], column[3]);
 
-	column[0] = state[2];
-	column[1] = state[6];
-	column[2] = state[10];
-	column[3] = state[14];
+	column[0] = tempstate[3];
+	column[1] = tempstate[7];
+	column[2] = tempstate[11];
+	column[3] = tempstate[15];
 	
-	state[2] = mixColumnsMult(matrix[0], column[0]) ^ mixColumnsMult(matrix[1], column[1]) ^ mixColumnsMult(matrix[2], column[2]) ^ mixColumnsMult(matrix[3], column[3]);
+	state[7] = mixColumnsMult(matrix[0], column[0]) ^ mixColumnsMult(matrix[1], column[1]) ^ mixColumnsMult(matrix[2], column[2]) ^ mixColumnsMult(matrix[3], column[3]);
 
-	state[6] = mixColumnsMult(matrix[4], column[0]) ^ mixColumnsMult(matrix[5], column[1]) ^ mixColumnsMult(matrix[6], column[2]) ^ mixColumnsMult(matrix[7], column[3]);
+	state[4] = mixColumnsMult(matrix[4], column[0]) ^ mixColumnsMult(matrix[5], column[1]) ^ mixColumnsMult(matrix[6], column[2]) ^ mixColumnsMult(matrix[7], column[3]);
 
-	state[10] = mixColumnsMult(matrix[8], column[0]) ^ mixColumnsMult(matrix[9], column[1]) ^ mixColumnsMult(matrix[10], column[2]) ^ mixColumnsMult(matrix[11], column[3]);
+	state[5] = mixColumnsMult(matrix[8], column[0]) ^ mixColumnsMult(matrix[9], column[1]) ^ mixColumnsMult(matrix[10], column[2]) ^ mixColumnsMult(matrix[11], column[3]);
 
-	state[14] = mixColumnsMult(matrix[12], column[0]) ^ mixColumnsMult(matrix[13], column[1]) ^ mixColumnsMult(matrix[14], column[2]) ^ mixColumnsMult(matrix[15], column[3]);
-
-	column[0] = state[3];
-	column[1] = state[7];
-	column[2] = state[11];
-	column[3] = state[15];
-	
-	state[3] = mixColumnsMult(matrix[0], column[0]) ^ mixColumnsMult(matrix[1], column[1]) ^ mixColumnsMult(matrix[2], column[2]) ^ mixColumnsMult(matrix[3], column[3]);
-
-	state[7] = mixColumnsMult(matrix[4], column[0]) ^ mixColumnsMult(matrix[5], column[1]) ^ mixColumnsMult(matrix[6], column[2]) ^ mixColumnsMult(matrix[7], column[3]);
-
-	state[11] = mixColumnsMult(matrix[8], column[0]) ^ mixColumnsMult(matrix[9], column[1]) ^ mixColumnsMult(matrix[10], column[2]) ^ mixColumnsMult(matrix[11], column[3]);
-
-	state[15] = mixColumnsMult(matrix[12], column[0]) ^ mixColumnsMult(matrix[13], column[1]) ^ mixColumnsMult(matrix[14], column[2]) ^ mixColumnsMult(matrix[15], column[3]);
+	state[6] = mixColumnsMult(matrix[12], column[0]) ^ mixColumnsMult(matrix[13], column[1]) ^ mixColumnsMult(matrix[14], column[2]) ^ mixColumnsMult(matrix[15], column[3]);
 }
 
 void addRoundKey(byte *state, byte *expandedkey, int round)
@@ -295,14 +328,34 @@ void encryptBlock(byte *state, byte *expandedkey)
 
 	addRoundKey(state, expandedkey, 0);
 
+	int q;
+	for(q = 0;q < 16;q++){
+			printf(" %02x ", state[q]);
+	}
+	printf("\n\n");
+
+
 	for(x = 1;x < i;x++){
 		subBytes(state);
 		shiftRows(state);
 		mixColumns(state);
 		addRoundKey(state, expandedkey, x);
+
+		int q;
+		for(q = 0;q < 16;q++){
+				printf(" %02x ", state[q]);
+		}
+		printf("\n");
+		
 	}		
 
 	subBytes(state);
-	shiftRows(state);
-	addRoundKey(state, expandedkey, x);
+
+		for(q = 0;q < 16;q++){
+				printf(" %02x ", state[q]);
+		}
+		printf("\n");
+
+	shiftColumns(state);
+	addRoundKey(state, expandedkey, i);
 }

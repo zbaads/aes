@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
 	encryptBlock(state, expandedkey);
 
 	int i;
+	printf("\n");
 	for(i = 0;i < 16;i++){
 			printf(" %02x ", state[i]);
 	}

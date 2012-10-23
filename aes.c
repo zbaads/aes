@@ -2,8 +2,8 @@
 #include <stdio.h>
 
 int bitkey = 128;
-int keyn = 16;
-int keyb = 176;
+int keyn = 16; //16 for 128, 24 for 192, 32 for 256
+int keyb = 176; //176 for 128, 208 for 192, 240 for 256
 
 static byte sbox[256] = {
 0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
@@ -319,43 +319,24 @@ void addRoundKey(byte *state, byte *expandedkey, int round)
 
 void encryptBlock(byte *state, byte *expandedkey)
 {
-	int i;	//generic iterator
+	int i = 0;	//generic iterator
 	int x;	//generic iterator
 
 	if(bitkey == 128) i = 10;
 	else if(bitkey == 192) i = 12;
 	else if(bitkey == 256) i = 14;
+	else printf("bitkey incorrect");
 
 	addRoundKey(state, expandedkey, 0);
-
-	int q;
-	for(q = 0;q < 16;q++){
-			printf(" %02x ", state[q]);
-	}
-	printf("\n\n");
-
 
 	for(x = 1;x < i;x++){
 		subBytes(state);
 		shiftRows(state);
 		mixColumns(state);
 		addRoundKey(state, expandedkey, x);
-
-		int q;
-		for(q = 0;q < 16;q++){
-				printf(" %02x ", state[q]);
-		}
-		printf("\n");
-		
 	}		
 
 	subBytes(state);
-
-		for(q = 0;q < 16;q++){
-				printf(" %02x ", state[q]);
-		}
-		printf("\n");
-
 	shiftColumns(state);
 	addRoundKey(state, expandedkey, i);
 }
